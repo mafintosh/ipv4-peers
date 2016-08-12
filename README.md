@@ -6,6 +6,8 @@ An [abstract-encoding](https://github.com/mafintosh/abstract-encoding) compliant
 npm install ipv4-peers
 ```
 
+[![build status](http://img.shields.io/travis/mafintosh/ipv4-peers.svg?style=flat)](http://travis-ci.org/mafintosh/ipv4-peers)
+
 ## Usage
 
 ``` js
