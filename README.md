@@ -39,6 +39,10 @@ Decode a buffer into a list of peers.
 
 Returns the amount of bytes needed to encode the peers into a buffer
 
+#### `peers = peers.idLength(idByteLength)`
+
+Create a new ipv4-peers decoder that encodes/decodes a fixed size peer id in addition to host/port. The peer id is exposed as the `.id` property on a peer object.
+
 ## License
 
 MIT

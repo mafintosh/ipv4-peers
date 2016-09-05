@@ -1,46 +1,67 @@
-exports.encodingLength = encodingLength
-exports.encode = encode
-exports.decode = decode
+module.exports = create(0)
 
-encode.bytes = decode.bytes = 0
+function create (idLength) {
+  if (!idLength) idLength = 0
 
-function encodingLength (peers) {
-  return peers.length * 6
-}
+  var entrySize = idLength + 6
 
-function encode (peers, buf, offset) {
-  if (!buf) buf = Buffer(encodingLength(peers))
-  if (!offset) offset = 0
+  encode.bytes = decode.bytes = 0
 
-  for (var i = 0; i < peers.length; i++) {
-    var host = peers[i].host.split('.')
-    var port = peers[i].port
-    buf[offset++] = parseInt(host[0], 10)
-    buf[offset++] = parseInt(host[1], 10)
-    buf[offset++] = parseInt(host[2], 10)
-    buf[offset++] = parseInt(host[3], 10)
-    buf.writeUInt16BE(port, offset)
-    offset += 2
+  return {
+    idLength: create,
+    encodingLength: encodingLength,
+    encode: encode,
+    decode: decode
   }
 
-  encode.bytes = peers.length * 6
-  return buf
-}
+  function encodingLength (peers) {
+    return peers.length * entrySize
+  }
 
-function decode (buf, offset, end) {
-  if (!offset) offset = 0
-  if (!end) end = buf.length
+  function encode (peers, buf, offset) {
+    if (!buf) buf = Buffer(encodingLength(peers))
+    if (!offset) offset = 0
 
-  var peers = Array(Math.floor((end - offset) / 6))
+    for (var i = 0; i < peers.length; i++) {
+      if (idLength) {
+        peers[i].id.copy(buf, offset)
+        offset += idLength
+      }
 
-  for (var i = 0; i < peers.length; i++) {
-    peers[i] = {
-      host: buf[offset++] + '.' + buf[offset++] + '.' + buf[offset++] + '.' + buf[offset++],
-      port: buf.readUInt16BE(offset)
+      var host = peers[i].host.split('.')
+      var port = peers[i].port
+      buf[offset++] = parseInt(host[0], 10)
+      buf[offset++] = parseInt(host[1], 10)
+      buf[offset++] = parseInt(host[2], 10)
+      buf[offset++] = parseInt(host[3], 10)
+      buf.writeUInt16BE(port, offset)
+      offset += 2
     }
-    offset += 2
+
+    encode.bytes = peers.length * entrySize
+    return buf
   }
 
-  decode.bytes = peers.length * 6
-  return peers
+  function decode (buf, offset, end) {
+    if (!offset) offset = 0
+    if (!end) end = buf.length
+
+    var peers = new Array(Math.floor((end - offset) / entrySize))
+
+    for (var i = 0; i < peers.length; i++) {
+      var id = null
+      if (idLength) {
+        id = buf.slice(offset, offset + idLength)
+        offset += idLength
+      }
+      var host = buf[offset++] + '.' + buf[offset++] + '.' + buf[offset++] + '.' + buf[offset++]
+      var port = buf.readUInt16BE(offset)
+
+      peers[i] = id ? {id: id, host: host, port: port} : {host: host, port: port}
+      offset += 2
+    }
+
+    decode.bytes = peers.length * entrySize
+    return peers
+  }
 }

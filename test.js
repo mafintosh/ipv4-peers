@@ -36,3 +36,13 @@ tape('encodes + decodes + offset + end', function (t) {
   t.same(peers.decode(peers.encode(b, Buffer(100)), 0, 12), b)
   t.end()
 })
+
+tape('encodes with peer id', function (t) {
+  var p = peers.idLength(5)
+  var a = [{id: Buffer('hello'), host: '127.0.0.1', port: 80}]
+  var b = [{id: Buffer('hello'), host: '127.0.0.1', port: 80}, {id: Buffer('world'), host: '127.0.0.1', port: 8080}]
+
+  t.same(p.decode(p.encode(a, Buffer(100)), 0, 11), a)
+  t.same(p.decode(p.encode(b, Buffer(100)), 0, 22), b)
+  t.end()
+})
