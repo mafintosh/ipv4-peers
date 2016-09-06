@@ -57,6 +57,8 @@ function create (idLength) {
       var host = buf[offset++] + '.' + buf[offset++] + '.' + buf[offset++] + '.' + buf[offset++]
       var port = buf.readUInt16BE(offset)
 
+      if (port === 0) throw new RangeError('Port should be > 0 and < 65536')
+
       peers[i] = id ? {id: id, host: host, port: port} : {host: host, port: port}
       offset += 2
     }

@@ -37,6 +37,15 @@ tape('encodes + decodes + offset + end', function (t) {
   t.end()
 })
 
+tape('port 0 not allowed', function (t) {
+  t.plan(1)
+  var a = [{host: '127.0.0.1', port: 0}]
+  t.throws(function () {
+    peers.decode(peers.encode(a))
+  })
+  t.end()
+})
+
 tape('encodes with peer id', function (t) {
   var p = peers.idLength(5)
   var a = [{id: Buffer('hello'), host: '127.0.0.1', port: 80}]
