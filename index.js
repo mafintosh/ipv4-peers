@@ -19,7 +19,7 @@ function create (idLength) {
   }
 
   function encode (peers, buf, offset) {
-    if (!buf) buf = Buffer(encodingLength(peers))
+    if (!buf) buf = Buffer.allocUnsafe(encodingLength(peers))
     if (!offset) offset = 0
 
     for (var i = 0; i < peers.length; i++) {
